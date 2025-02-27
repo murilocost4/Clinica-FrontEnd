@@ -1,16 +1,30 @@
 import React, { useState } from 'react';
 import Modal from '../components/common/Modal';
 import ProfissionalList from '../components/profissionais/ProfissionalList';
-import ProfissionalForm from '../components/profissionais/ProfissionalForm';
+import ModalProfissional from '../components/profissionais/ModalProfissional';
 
 const Profissionais = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [profissionalEditando, setProfissionalEditando] = useState(null);
 
   const [profissionais, setProfissionais] = useState([
-    { id: 1, nome: 'Dr. Ana', cpf: '123.456.789-00', especialidade: 'Cardiologia', telefone: '(11) 99999-9999' },
-    { id: 2, nome: 'Dr. Carlos', cpf: '987.654.321-00', especialidade: 'Ortopedia', telefone: '(11) 88888-8888' },
-    { id: 3, nome: 'Dr. Pedro', cpf: '456.789.123-00', especialidade: 'Pediatria', telefone: '(11) 77777-7777' },
+    {
+      id: 1,
+      nome: 'Dr. João Silva',
+      cpf: '123.456.789-00',
+      crmCrf: 'CRM/12345',
+      especialidade: 'Cardiologia',
+      telefone: '(11) 99999-9999',
+      servicos: 'Consultas, Exames Cardiológicos',
+      atendimentos: [
+        {
+          id: 1,
+          data: '2023-10-01',
+          paciente: 'Maria Souza',
+          descricao: 'Consulta de rotina',
+        },
+      ],
+    },
   ]);
 
   const handleAbrirModal = () => {
@@ -28,7 +42,14 @@ const Profissionais = () => {
         prev.map((p) => (p.id === profissionalEditando.id ? { ...p, ...profissional } : p))
       );
     } else {
-      setProfissionais((prev) => [...prev, { ...profissional, id: prev.length + 1 }]);
+      setProfissionais((prev) => [
+        ...prev,
+        {
+          ...profissional,
+          id: prev.length + 1,
+          atendimentos: [], // Inicializa o histórico de atendimentos vazio
+        },
+      ]);
     }
     setIsModalOpen(false);
   };
@@ -45,7 +66,6 @@ const Profissionais = () => {
 
   return (
     <div className="p-6">
-      {/* Título e Botão de Adicionar */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Profissionais</h1>
         <button
@@ -65,10 +85,7 @@ const Profissionais = () => {
 
       {/* Modal de Cadastro/Edição */}
       <Modal isOpen={isModalOpen} onClose={handleFecharModal}>
-        <h2 className="text-xl font-bold text-gray-800 mb-4">
-          {profissionalEditando ? 'Editar Profissional' : 'Adicionar Profissional'}
-        </h2>
-        <ProfissionalForm
+        <ModalProfissional
           profissional={profissionalEditando}
           onSalvar={handleSalvarProfissional}
           onCancelar={handleFecharModal}

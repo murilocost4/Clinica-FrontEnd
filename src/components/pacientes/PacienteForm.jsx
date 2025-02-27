@@ -11,6 +11,9 @@ const PacienteForm = ({ paciente, onSalvar, onCancelar }) => {
           cpf: formData.get('cpf'),
           dataNascimento: formData.get('dataNascimento'),
           telefone: formData.get('telefone'),
+          doencas: formData.get('doencas'),
+          alergias: formData.get('alergias'),
+          cirurgias: formData.get('cirurgias'),
         };
         onSalvar(novoPaciente);
       }}
@@ -56,6 +59,41 @@ const PacienteForm = ({ paciente, onSalvar, onCancelar }) => {
             required
           />
         </div>
+
+        {/* Informações de Saúde */}
+        <div className="mt-6">
+          <h2 className="text-lg font-bold text-gray-800">Informações de Saúde</h2>
+          <div className="mt-2 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Doenças</label>
+              <textarea
+                name="doencas"
+                defaultValue={paciente?.doencas || ''}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                rows="3"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Alergias</label>
+              <textarea
+                name="alergias"
+                defaultValue={paciente?.alergias || ''}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                rows="3"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Cirurgias</label>
+              <textarea
+                name="cirurgias"
+                defaultValue={paciente?.cirurgias || ''}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                rows="3"
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="flex justify-end space-x-2">
           <button
             type="button"

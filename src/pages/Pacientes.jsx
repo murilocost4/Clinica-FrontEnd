@@ -1,16 +1,48 @@
 import React, { useState } from 'react';
 import Modal from '../components/common/Modal';
 import PacienteList from '../components/pacientes/PacienteList';
-import PacienteForm from '../components/pacientes/PacienteForm';
+import ModalPaciente from '../components/pacientes/ModalPaciente'; // Importando o novo modal com abas
 
 const Pacientes = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pacienteEditando, setPacienteEditando] = useState(null);
 
   const [pacientes, setPacientes] = useState([
-    { id: 1, nome: 'João Silva', cpf: '123.456.789-00', dataNascimento: '1990-01-01', telefone: '(11) 99999-9999' },
-    { id: 2, nome: 'Maria Souza', cpf: '987.654.321-00', dataNascimento: '1985-05-15', telefone: '(11) 88888-8888' },
-    { id: 3, nome: 'Pedro Oliveira', cpf: '456.789.123-00', dataNascimento: '1978-12-25', telefone: '(11) 77777-7777' },
+    {
+      id: 1,
+      nome: 'João Silva',
+      cpf: '123.456.789-00',
+      dataNascimento: '1990-01-01',
+      telefone: '(11) 99999-9999',
+      doencas: 'Hipertensão',
+      alergias: 'Penicilina',
+      cirurgias: 'Apêndice (2015)',
+      atendimentos: [
+        {
+          id: 1,
+          data: '2023-10-01',
+          medico: 'Dr. João Silva',
+          descricao: 'Consulta de rotina',
+        },
+        {
+          id: 2,
+          data: '2023-10-05',
+          medico: 'Dra. Maria Souza',
+          descricao: 'Acompanhamento pós-cirúrgico',
+        },
+      ],
+    },
+    {
+      id: 2,
+      nome: 'Maria Souza',
+      cpf: '987.654.321-00',
+      dataNascimento: '1985-05-15',
+      telefone: '(11) 88888-8888',
+      doencas: 'Diabetes',
+      alergias: 'Nenhuma',
+      cirurgias: 'Nenhuma',
+      atendimentos: [],
+    },
   ]);
 
   const handleAbrirModal = () => {
@@ -24,11 +56,20 @@ const Pacientes = () => {
 
   const handleSalvarPaciente = (paciente) => {
     if (pacienteEditando) {
+      // Atualiza o paciente existente
       setPacientes((prev) =>
         prev.map((p) => (p.id === pacienteEditando.id ? { ...p, ...paciente } : p))
       );
     } else {
-      setPacientes((prev) => [...prev, { ...paciente, id: prev.length + 1 }]);
+      // Adiciona um novo paciente
+      setPacientes((prev) => [
+        ...prev,
+        {
+          ...paciente,
+          id: prev.length + 1,
+          atendimentos: [], // Inicializa o histórico de atendimentos vazio
+        },
+      ]);
     }
     setIsModalOpen(false);
   };
@@ -45,7 +86,6 @@ const Pacientes = () => {
 
   return (
     <div className="p-6">
-      {/* Título e Botão de Adicionar */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Pacientes</h1>
         <button
@@ -65,10 +105,7 @@ const Pacientes = () => {
 
       {/* Modal de Cadastro/Edição */}
       <Modal isOpen={isModalOpen} onClose={handleFecharModal}>
-        <h2 className="text-xl font-bold text-gray-800 mb-4">
-          {pacienteEditando ? 'Editar Paciente' : 'Adicionar Paciente'}
-        </h2>
-        <PacienteForm
+        <ModalPaciente
           paciente={pacienteEditando}
           onSalvar={handleSalvarPaciente}
           onCancelar={handleFecharModal}
