@@ -1,92 +1,101 @@
-import React, { useState } from 'react';
-import DadosPessoais from './DadosPessoais';
-import Servicos from './Servicos';
-import HistoricoAtendimentos from './HistoricoAtendimentos';
+import React, { useState, useEffect } from 'react';
 
 const ModalProfissional = ({ profissional, onSalvar, onCancelar }) => {
-  const [abaAtiva, setAbaAtiva] = useState('dadosPessoais');
+  const [formData, setFormData] = useState({
+    nome: '',
+    cpf: '',
+    especialidade: '',
+    telefone: '',
+  });
 
-  const handleSalvar = () => {
-    // Lógica para salvar os dados do profissional
-    onSalvar(profissional);
+  // Preenche o formulário se estiver editando
+  useEffect(() => {
+    if (profissional) {
+      setFormData(profissional);
+    } else {
+      setFormData({
+        nome: '',
+        cpf: '',
+        especialidade: '',
+        telefone: '',
+      });
+    }
+  }, [profissional]);
+
+  // Atualiza os dados do formulário
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Envia os dados para salvar
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSalvar(formData);
   };
 
   return (
-    <div className="fixed inset-0 backdrop-blur-sm bg-opacity-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl">
-        {/* Cabeçalho do Modal */}
-        <div className="p-6 border-b">
-          <h2 className="text-xl font-bold text-gray-800">
-            {profissional ? 'Editar Profissional' : 'Adicionar Profissional'}
-          </h2>
-        </div>
-
-        {/* Abas */}
-        <div className="p-6">
-          <div className="flex space-x-4 mb-6">
-            <button
-              onClick={() => setAbaAtiva('dadosPessoais')}
-              className={`px-4 py-2 rounded-lg ${
-                abaAtiva === 'dadosPessoais'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              Dados Pessoais
-            </button>
-            <button
-              onClick={() => setAbaAtiva('servicos')}
-              className={`px-4 py-2 rounded-lg ${
-                abaAtiva === 'servicos'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              Serviços
-            </button>
-            <button
-              onClick={() => setAbaAtiva('historicoAtendimentos')}
-              className={`px-4 py-2 rounded-lg ${
-                abaAtiva === 'historicoAtendimentos'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              Histórico de Atendimentos
-            </button>
-          </div>
-
-          {/* Conteúdo das Abas */}
-          <div>
-            {abaAtiva === 'dadosPessoais' && (
-              <DadosPessoais profissional={profissional} />
-            )}
-            {abaAtiva === 'servicos' && (
-              <Servicos profissional={profissional} />
-            )}
-            {abaAtiva === 'historicoAtendimentos' && (
-              <HistoricoAtendimentos profissional={profissional} />
-            )}
-          </div>
-        </div>
-
-        {/* Rodapé do Modal */}
-        <div className="p-6 border-t flex justify-end space-x-2">
-          <button
-            onClick={onCancelar}
-            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleSalvar}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Salvar
-          </button>
-        </div>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Nome</label>
+        <input
+          type="text"
+          name="nome"
+          value={formData.nome}
+          onChange={handleChange}
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+          required
+        />
       </div>
-    </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">CPF</label>
+        <input
+          type="text"
+          name="cpf"
+          value={formData.cpf}
+          onChange={handleChange}
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Especialidade</label>
+        <input
+          type="text"
+          name="especialidade"
+          value={formData.especialidade}
+          onChange={handleChange}
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Telefone</label>
+        <input
+          type="text"
+          name="telefone"
+          value={formData.telefone}
+          onChange={handleChange}
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+          required
+        />
+      </div>
+      <div className="flex justify-end space-x-2">
+        <button
+          type="button"
+          onClick={onCancelar}
+          className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+        >
+          Salvar
+        </button>
+      </div>
+    </form>
   );
 };
 

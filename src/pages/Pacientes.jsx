@@ -1,87 +1,50 @@
 import React, { useState } from 'react';
 import Modal from '../components/common/Modal';
 import PacienteList from '../components/pacientes/PacienteList';
-import ModalPaciente from '../components/pacientes/ModalPaciente'; // Importando o novo modal com abas
+import ModalPaciente from '../components/pacientes/ModalPaciente';
+import { createUsuario, updateUsuario } from '../services/Usuarios'; // Importe as funções da API
 
 const Pacientes = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pacienteEditando, setPacienteEditando] = useState(null);
 
-  const [pacientes, setPacientes] = useState([
-    {
-      id: 1,
-      nome: 'João Silva',
-      cpf: '123.456.789-00',
-      dataNascimento: '1990-01-01',
-      telefone: '(11) 99999-9999',
-      doencas: 'Hipertensão',
-      alergias: 'Penicilina',
-      cirurgias: 'Apêndice (2015)',
-      atendimentos: [
-        {
-          id: 1,
-          data: '2023-10-01',
-          medico: 'Dr. João Silva',
-          descricao: 'Consulta de rotina',
-        },
-        {
-          id: 2,
-          data: '2023-10-05',
-          medico: 'Dra. Maria Souza',
-          descricao: 'Acompanhamento pós-cirúrgico',
-        },
-      ],
-    },
-    {
-      id: 2,
-      nome: 'Maria Souza',
-      cpf: '987.654.321-00',
-      dataNascimento: '1985-05-15',
-      telefone: '(11) 88888-8888',
-      doencas: 'Diabetes',
-      alergias: 'Nenhuma',
-      cirurgias: 'Nenhuma',
-      atendimentos: [],
-    },
-  ]);
-
+  // Abrir modal para adicionar ou editar paciente
   const handleAbrirModal = () => {
-    setPacienteEditando(null);
+    setPacienteEditando(null); // Limpa o paciente em edição
     setIsModalOpen(true);
   };
 
+  // Fechar modal
   const handleFecharModal = () => {
     setIsModalOpen(false);
   };
 
-  const handleSalvarPaciente = (paciente) => {
-    if (pacienteEditando) {
-      // Atualiza o paciente existente
-      setPacientes((prev) =>
-        prev.map((p) => (p.id === pacienteEditando.id ? { ...p, ...paciente } : p))
-      );
-    } else {
-      // Adiciona um novo paciente
-      setPacientes((prev) => [
-        ...prev,
-        {
-          ...paciente,
-          id: prev.length + 1,
-          atendimentos: [], // Inicializa o histórico de atendimentos vazio
-        },
-      ]);
+  const handleSalvarPaciente = async (paciente) => {
+    try {
+      console.log('Dados do paciente a serem enviados:', paciente); // Depuração
+  
+      // Garante que o campo 'birthDate' está no formato ISO-8601
+      const payload = {
+        ...paciente,
+        birthDate: new Date(paciente.birthDate).toISOString(), // Converte para ISO-8601
+      };
+  
+      if (paciente.id) {
+        await updateUsuario(paciente.id, payload);
+      } else {
+        await createUsuario(payload);
+      }
+      setIsModalOpen(false); // Fecha o modal após salvar
+    } catch (error) {
+      console.error('Erro ao salvar paciente:', error.response?.data || error.message); // Depuração
+      alert('Erro ao salvar paciente.');
     }
-    setIsModalOpen(false);
   };
 
-  const handleEditarPaciente = (id) => {
-    const paciente = pacientes.find((p) => p.id === id);
-    setPacienteEditando(paciente);
-    setIsModalOpen(true);
-  };
-
-  const handleExcluirPaciente = (id) => {
-    setPacientes((prev) => prev.filter((p) => p.id !== id));
+  // Editar paciente
+  const handleEditarPaciente = (paciente) => {
+    setPacienteEditando(paciente); // Define o paciente em edição
+    setIsModalOpen(true); // Abre o modal
   };
 
   return (
@@ -97,17 +60,13 @@ const Pacientes = () => {
       </div>
 
       {/* Lista de Pacientes */}
-      <PacienteList
-        pacientes={pacientes}
-        onEditar={handleEditarPaciente}
-        onExcluir={handleExcluirPaciente}
-      />
+      <PacienteList onEditar={handleEditarPaciente} />
 
       {/* Modal de Cadastro/Edição */}
       <Modal isOpen={isModalOpen} onClose={handleFecharModal}>
         <ModalPaciente
           paciente={pacienteEditando}
-          onSalvar={handleSalvarPaciente}
+          onSalvar={handleSalvarPaciente} // Passa a função de salvar
           onCancelar={handleFecharModal}
         />
       </Modal>

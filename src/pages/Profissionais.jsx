@@ -2,30 +2,16 @@ import React, { useState } from 'react';
 import Modal from '../components/common/Modal';
 import ProfissionalList from '../components/profissionais/ProfissionalList';
 import ModalProfissional from '../components/profissionais/ModalProfissional';
+import {
+  createUsuario,
+  updateUsuario,
+  deleteUsuario,
+} from '../services/Usuarios';
 
 const Profissionais = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [profissionalEditando, setProfissionalEditando] = useState(null);
-
-  const [profissionais, setProfissionais] = useState([
-    {
-      id: 1,
-      nome: 'Dr. João Silva',
-      cpf: '123.456.789-00',
-      crmCrf: 'CRM/12345',
-      especialidade: 'Cardiologia',
-      telefone: '(11) 99999-9999',
-      servicos: 'Consultas, Exames Cardiológicos',
-      atendimentos: [
-        {
-          id: 1,
-          data: '2023-10-01',
-          paciente: 'Maria Souza',
-          descricao: 'Consulta de rotina',
-        },
-      ],
-    },
-  ]);
+  const [recarregarLista, setRecarregarLista] = useState(false);
 
   const handleAbrirModal = () => {
     setProfissionalEditando(null);
@@ -36,32 +22,37 @@ const Profissionais = () => {
     setIsModalOpen(false);
   };
 
-  const handleSalvarProfissional = (profissional) => {
-    if (profissionalEditando) {
-      setProfissionais((prev) =>
-        prev.map((p) => (p.id === profissionalEditando.id ? { ...p, ...profissional } : p))
-      );
-    } else {
-      setProfissionais((prev) => [
-        ...prev,
-        {
-          ...profissional,
-          id: prev.length + 1,
-          atendimentos: [], // Inicializa o histórico de atendimentos vazio
-        },
-      ]);
+  const handleSalvarProfissional = async (profissional) => {
+    try {
+      console.log('Dados do profissional a serem enviados:', profissional);
+
+      if (profissionalEditando) {
+        await updateUsuario(profissionalEditando.id, profissional);
+      } else {
+        await createUsuario(profissional);
+      }
+
+      setIsModalOpen(false);
+      setRecarregarLista((prev) => !prev);
+    } catch (error) {
+      console.error('Erro ao salvar profissional:', error.response?.data || error.message);
+      alert('Erro ao salvar profissional.');
     }
-    setIsModalOpen(false);
   };
 
-  const handleEditarProfissional = (id) => {
-    const profissional = profissionais.find((p) => p.id === id);
+  const handleEditarProfissional = (profissional) => {
     setProfissionalEditando(profissional);
     setIsModalOpen(true);
   };
 
-  const handleExcluirProfissional = (id) => {
-    setProfissionais((prev) => prev.filter((p) => p.id !== id));
+  const handleExcluirProfissional = async (profissional) => {
+    try {
+      await deleteUsuario(profissional.id);
+      setRecarregarLista((prev) => !prev);
+    } catch (error) {
+      console.error('Erro ao excluir profissional:', error.response?.data || error.message);
+      alert('Erro ao excluir profissional.');
+    }
   };
 
   return (
@@ -76,14 +67,12 @@ const Profissionais = () => {
         </button>
       </div>
 
-      {/* Lista de Profissionais */}
       <ProfissionalList
-        profissionais={profissionais}
         onEditar={handleEditarProfissional}
         onExcluir={handleExcluirProfissional}
+        recarregarLista={recarregarLista}
       />
 
-      {/* Modal de Cadastro/Edição */}
       <Modal isOpen={isModalOpen} onClose={handleFecharModal}>
         <ModalProfissional
           profissional={profissionalEditando}

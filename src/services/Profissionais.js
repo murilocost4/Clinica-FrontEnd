@@ -1,26 +1,19 @@
 import api from './api';
 
 export const getProfissionais = async () => {
-  const response = await api.get('/profissionais');
-  return response.data;
-};
+  try {
+    const response = await api.get('/profissionais');
+    console.log("Resposta da API:", response); // Depuração
 
-export const getProfissionalById = async (id) => {
-  const response = await api.get(`/profissionais/${id}`);
-  return response.data;
-};
-
-export const createProfissional = async (profissional) => {
-  const response = await api.post('/profissionais', profissional);
-  return response.data;
-};
-
-export const updateProfissional = async (id, profissional) => {
-  const response = await api.put(`/profissionais/${id}`, profissional);
-  return response.data;
-};
-
-export const deleteProfissional = async (id) => {
-  const response = await api.delete(`/profissionais/${id}`);
-  return response.data;
+    // Verifica se a resposta contém dados
+    if (response.data && response.data.success !== false) {
+      console.log("Profissionais recebidos:", response.data.data); // Log dos dados recebidos
+      return response.data.data; // Retorna o array de profissionais
+    } else {
+      throw new Error(response.data?.error || "Erro ao buscar profissionais.");
+    }
+  } catch (error) {
+    console.error("Erro ao buscar profissionais:", error); // Log de erro
+    throw error; // Propaga o erro para ser tratado pelo chamador
+  }
 };

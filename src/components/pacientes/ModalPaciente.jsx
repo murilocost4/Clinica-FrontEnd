@@ -1,73 +1,33 @@
 import React, { useState } from 'react';
-import InformacoesPessoais from './InformacoesPessoais';
-import InformacoesSaude from './InformacoesSaude';
-import HistoricoProntuarios from './HistoricoProntuarios';
+import InformacoesPessoais from './InformacoesPessoais'; // Reutilize o componente de informações pessoais
 
-const ModalPaciente = ({ paciente, onSalvar, onCancelar }) => {
-  const [abaAtiva, setAbaAtiva] = useState('informacoesPessoais');
+const ModalProfissional = ({ profissional, onSalvar, onCancelar }) => {
+  const [dadosProfissional, setDadosProfissional] = useState({
+    ...profissional,
+    role: 'Profissional', // Valor padrão
+  });
 
+  // Função para salvar os dados do profissional
   const handleSalvar = () => {
-    // Lógica para salvar os dados do paciente
-    onSalvar(paciente);
+    onSalvar(dadosProfissional); // Passa os dados atualizados para o componente pai
   };
 
   return (
     <div className="fixed inset-0 backdrop-blur-sm bg-opacity-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] flex flex-col">
         {/* Cabeçalho do Modal */}
         <div className="p-6 border-b">
           <h2 className="text-xl font-bold text-gray-800">
-            {paciente ? 'Editar Paciente' : 'Adicionar Paciente'}
+            {dadosProfissional.id ? 'Editar Profissional' : 'Adicionar Profissional'}
           </h2>
         </div>
 
-        {/* Abas */}
-        <div className="p-6">
-          <div className="flex space-x-4 mb-6">
-            <button
-              onClick={() => setAbaAtiva('informacoesPessoais')}
-              className={`px-4 py-2 rounded-lg ${
-                abaAtiva === 'informacoesPessoais'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              Informações Pessoais
-            </button>
-            <button
-              onClick={() => setAbaAtiva('informacoesSaude')}
-              className={`px-4 py-2 rounded-lg ${
-                abaAtiva === 'informacoesSaude'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              Informações de Saúde
-            </button>
-            <button
-              onClick={() => setAbaAtiva('historicoProntuarios')}
-              className={`px-4 py-2 rounded-lg ${
-                abaAtiva === 'historicoProntuarios'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              Histórico/Prontuários
-            </button>
-          </div>
-
-          {/* Conteúdo das Abas */}
-          <div>
-            {abaAtiva === 'informacoesPessoais' && (
-              <InformacoesPessoais paciente={paciente} />
-            )}
-            {abaAtiva === 'informacoesSaude' && (
-              <InformacoesSaude paciente={paciente} />
-            )}
-            {abaAtiva === 'historicoProntuarios' && (
-              <HistoricoProntuarios paciente={paciente} />
-            )}
-          </div>
+        {/* Conteúdo do Modal */}
+        <div className="p-6 flex-1 overflow-y-auto">
+          <InformacoesPessoais
+            paciente={dadosProfissional} // Reutiliza o mesmo componente
+            onChange={setDadosProfissional} // Atualiza os dados do profissional
+          />
         </div>
 
         {/* Rodapé do Modal */}
@@ -90,4 +50,4 @@ const ModalPaciente = ({ paciente, onSalvar, onCancelar }) => {
   );
 };
 
-export default ModalPaciente;
+export default ModalProfissional;
