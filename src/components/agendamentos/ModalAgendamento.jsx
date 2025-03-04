@@ -1,25 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import DadosPaciente from './DadosPaciente';
-import ProntuarioEvolucao from './ProntuarioEvolucao';
-import ReceitaPrescricao from './ReceitaPrescricao';
 import { getAgendamentoById } from '../../services/Agendamentos';
 
 const ModalAgendamento = ({ agendamento, onSalvar, onCancelar }) => {
   const [abaAtiva, setAbaAtiva] = useState('dadosPaciente');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [dadosAgendamento, setDadosAgendamento] = useState(agendamento || {
-    paciente: '',
-    profissional: '',
-    sala: '',
-    dateTime: new Date().toISOString().slice(0, 16),
-    status: 'solicitado',
-    notes: '',
-    prontuario: {},
-    receita: {}
+  const [dadosAgendamento, setDadosAgendamento] = useState({
+    paciente: agendamento?.paciente || '',
+    profissional: agendamento?.profissional || '',
+    sala: agendamento?.sala || '',
+    dateTime: agendamento?.dateTime || new Date().toISOString().slice(0, 16),
+    status: agendamento?.status || 'solicitado',
+    notes: agendamento?.notes || '',
+    prontuario: agendamento?.prontuario || {},
+    receita: agendamento?.receita || {}
   });
 
-  // Carregar detalhes completos do agendamento, se for edição
   useEffect(() => {
     if (agendamento?.id) {
       fetchAgendamentoDetails(agendamento.id);
@@ -48,46 +45,26 @@ const ModalAgendamento = ({ agendamento, onSalvar, onCancelar }) => {
   };
 
   const handleSalvar = () => {
-    // Validar dados
     if (!dadosAgendamento.paciente || !dadosAgendamento.profissional || !dadosAgendamento.dateTime) {
       setError('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
-
-    // Enviar dados para o componente pai
     onSalvar(dadosAgendamento);
   };
 
-  // Atualizar dados específicos da aba ativa
   const handleUpdateTabData = (tabData) => {
-    if (abaAtiva === 'dadosPaciente') {
-      setDadosAgendamento(prev => ({
-        ...prev,
+    setDadosAgendamento((prev) => ({
+      ...prev,
+      [abaAtiva]: {
+        ...prev[abaAtiva],
         ...tabData
-      }));
-    } else if (abaAtiva === 'prontuarioEvolucao') {
-      setDadosAgendamento(prev => ({
-        ...prev,
-        prontuario: {
-          ...prev.prontuario,
-          ...tabData
-        }
-      }));
-    } else if (abaAtiva === 'receitaPrescricao') {
-      setDadosAgendamento(prev => ({
-        ...prev,
-        receita: {
-          ...prev.receita,
-          ...tabData
-        }
-      }));
-    }
+      }
+    }));
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 backdrop-blur-sm backdrop-brightness-90 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl overflow-y-auto max-h-screen">
-        {/* Cabeçalho do Modal */}
         <div className="p-6 border-b flex justify-between items-center">
           <h2 className="text-xl font-bold text-gray-800">
             {agendamento ? 'Editar Agendamento' : 'Adicionar Agendamento'}
@@ -95,49 +72,27 @@ const ModalAgendamento = ({ agendamento, onSalvar, onCancelar }) => {
           {loading && <span className="text-sm text-blue-500">Carregando...</span>}
         </div>
 
-        {/* Mensagem de erro */}
         {error && (
           <div className="mx-6 mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             {error}
           </div>
         )}
 
-        {/* Abas */}
         <div className="p-6">
           <div className="flex space-x-4 mb-6 overflow-x-auto">
-            <button
-              onClick={() => setAbaAtiva('dadosPaciente')}
-              className={`px-4 py-2 rounded-lg whitespace-nowrap ${
-                abaAtiva === 'dadosPaciente'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              Dados do Paciente
-            </button>
-            <button
-              onClick={() => setAbaAtiva('prontuarioEvolucao')}
-              className={`px-4 py-2 rounded-lg whitespace-nowrap ${
-                abaAtiva === 'prontuarioEvolucao'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              Prontuário e Evolução
-            </button>
-            <button
-              onClick={() => setAbaAtiva('receitaPrescricao')}
-              className={`px-4 py-2 rounded-lg whitespace-nowrap ${
-                abaAtiva === 'receitaPrescricao'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              Receita/Prescrição
-            </button>
+            {['dadosPaciente'].map((aba) => (
+              <button
+                key={aba}
+                onClick={() => setAbaAtiva(aba)}
+                className={`px-4 py-2 rounded-lg whitespace-nowrap ${
+                  abaAtiva === aba ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                {aba === 'dadosPaciente' ? 'Dados da Solicitação' : aba === 'prontuario' ? 'Prontuário e Evolução' : 'Receita/Prescrição'}
+              </button>
+            ))}
           </div>
 
-          {/* Conteúdo das Abas */}
           <div>
             {abaAtiva === 'dadosPaciente' && (
               <DadosPaciente 
@@ -146,24 +101,9 @@ const ModalAgendamento = ({ agendamento, onSalvar, onCancelar }) => {
                 disabled={loading}
               />
             )}
-            {abaAtiva === 'prontuarioEvolucao' && (
-              <ProntuarioEvolucao 
-                prontuario={dadosAgendamento.prontuario} 
-                onChange={handleUpdateTabData}
-                disabled={loading} 
-              />
-            )}
-            {abaAtiva === 'receitaPrescricao' && (
-              <ReceitaPrescricao 
-                receita={dadosAgendamento.receita} 
-                onChange={handleUpdateTabData}
-                disabled={loading}
-              />
-            )}
           </div>
         </div>
 
-        {/* Rodapé do Modal */}
         <div className="p-6 border-t flex justify-end space-x-2">
           <button
             onClick={onCancelar}

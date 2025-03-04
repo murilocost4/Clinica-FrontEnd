@@ -6,7 +6,7 @@ import {
   getAgendamentos, 
   createAgendamento, 
   updateAgendamento, 
-  deleteAgendamento 
+  deleteAgendamento,
 } from '../services/Agendamentos';
 import ModalAgendamento from '../components/agendamentos/ModalAgendamento';
 

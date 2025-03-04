@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AgendamentoForm = ({ agendamento, onSalvar, onCancelar }) => {
+const AgendamentoForm = ({ agendamento = {}, onSalvar, onCancelar }) => {
   return (
     <form
       onSubmit={(e) => {
@@ -9,8 +9,8 @@ const AgendamentoForm = ({ agendamento, onSalvar, onCancelar }) => {
         const novoAgendamento = {
           paciente: formData.get('paciente'),
           profissional: formData.get('profissional'),
-          dataHora: formData.get('dataHora'),
-          status: formData.get('status'),
+          dataHora: formData.get('dataHora') || new Date().toISOString().slice(0, 16),
+          status: formData.get('status') || 'agendado',
         };
         onSalvar(novoAgendamento);
       }}
@@ -21,7 +21,7 @@ const AgendamentoForm = ({ agendamento, onSalvar, onCancelar }) => {
           <input
             type="text"
             name="paciente"
-            defaultValue={agendamento?.paciente || ''}
+            defaultValue={agendamento.paciente || ''}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             required
           />
@@ -31,7 +31,7 @@ const AgendamentoForm = ({ agendamento, onSalvar, onCancelar }) => {
           <input
             type="text"
             name="profissional"
-            defaultValue={agendamento?.profissional || ''}
+            defaultValue={agendamento.profissional || ''}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             required
           />
@@ -41,7 +41,7 @@ const AgendamentoForm = ({ agendamento, onSalvar, onCancelar }) => {
           <input
             type="datetime-local"
             name="dataHora"
-            defaultValue={agendamento?.dataHora || ''}
+            defaultValue={agendamento.dataHora || new Date().toISOString().slice(0, 16)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             required
           />
@@ -50,7 +50,7 @@ const AgendamentoForm = ({ agendamento, onSalvar, onCancelar }) => {
           <label className="block text-sm font-medium text-gray-700">Status</label>
           <select
             name="status"
-            defaultValue={agendamento?.status || ''}
+            defaultValue={agendamento.status || 'agendado'}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             required
           >

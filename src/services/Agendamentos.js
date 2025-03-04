@@ -24,3 +24,15 @@ export const deleteAgendamento = async (id) => {
   const response = await api.delete(`/agendamentos/${id}`);
   return response.data;
 };
+
+// Confirmar um agendamento
+export const confirmarAgendamento = async (id) => {
+  const response = await api.put(`/agendamentos/${id}/confirmar`);
+  return response.data;
+};
+
+// Cancelar um agendamento
+export const cancelarAgendamento = async (id) => {
+  const response = await api.put(`/agendamentos/${id}/cancelar`);
+  return response.data;
+};
